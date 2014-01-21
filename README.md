@@ -1,7 +1,7 @@
 temple.js
 =========
 
-A micro-framework for partial template loading with AJAX.
+A micro-library for partial template loading with AJAX.
 
 Depends on jQuery, and some simple backend sorcery.
 
