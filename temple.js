@@ -27,24 +27,41 @@ function fixURL(newUrl) {
     window.location.hash = newUrl;
 }
 $(window).bind('hashchange', function (e) {
-    var target = window.location.hash.slice(1);
+    var target = window.location.hash.split('#');
+    target = target[target.length - 1];
     $el = $("#nav-set div").filter(function () {
         if (target == "") target = "/";
         return $(this).attr("href") == target;
     });
-    if ($el.length > 0) doNavigate($el);
-    else loadContent(target);
+    if ($el.length > 0) doNavigate($el.attr("href"));
+    else {
+        console.log(target);
+        loadContent(target);
+    }
 });
 
 function pageCustoms(target) {}
+function navCustoms(link) { 
+var $el = $("#nav-set div").filter(function () {
+            if (link && link.length > 1) {
+                link = link.split("#");
+                link = link[link.length - 1]
+            } else link = "/";
+            console.log(link + " " + $(this).attr("href"));
+            return $(this).attr("href") == link;
+    });
+    return [$el.attr("title"), $el.attr("href")]; 
+}
 
-function doNavigate($link, noload) {
-    if (!($link && $link.length)) return;
-    var title = $link.attr("title");
+function doNavigate(href, noload) {
+    if (!href) return;
     $(".active").removeClass("active");
-    rotateTo(title);
-    $link.addClass("active"); 
-    if (!noload) loadContent($link.attr('href'));
+
+    var a = navCustoms(href);
+    title = a[0];
+    href = a[1];
+
+    if (!noload) loadContent(href);
 }
 
 function updateLinks() {
@@ -61,10 +78,12 @@ function updateLinks() {
 
 function setup() {
     $("#nav-set div").on("click", function () { 
-            doNavigate($(this));
-            fixURL($(this).attr('href'));
+            var href = $(this).attr('href');
+            doNavigate(href);
+            fixURL(href);
         });
-    doNavigate($("#nav-set div").filter(function () {
-            return $(this).attr("href") == window.location.hash.slice(1);
-    }), false);
+    var x = window.location.hash;
+    if (x) x = x.split("#");
+    else x = "/";
+    doNavigate(x[x.length - 1], false);
 }
